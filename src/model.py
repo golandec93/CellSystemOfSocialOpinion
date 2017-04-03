@@ -1,5 +1,5 @@
-from numpy.random import random
 from math import exp
+import numpy.random as nprnd
 
 
 class Cell:
@@ -18,31 +18,36 @@ class CellSystem:
         self.system_lobby_plus = system_lobby_plus
         self.social_temperature = social_temperature
         self.cells = cells
+        self.old_opinions = {}
+        self._update_opinions_history()
 
     def __next__(self):
-        self.cells.__next__()
+        return self.cells.__next__()
 
     def __iter__(self):
-        self.cells.__iter__()
+        return self.cells.__iter__()
+
+    def __getitem__(self, item):
+        return self.cells[item]
+
+    def __len__(self, other):
+        return self.cells.__len__()
 
     def get_influence(self, cell):
-        if cell.opinion > 0:
-            lobby = self.system_lobby_plus
-        else:
-            lobby = self.system_lobby_minus
-        influence = - cell.s * cell.b - cell.opinion * lobby
-        for other_cell in self:
-            if cell is other_cell:
-                pass
-            influence -= (other_cell.s * other_cell.opinion * cell.opinion) / self.measure(cell, other_cell)
+        lobby = self.system_lobby_plus if cell.opinion > 0 else self.system_lobby_minus
+        influence = - cell.s * cell.b - self.old_opinions[cell] * lobby
+        for other in self:
+            if cell is not other:
+                influence -= (other.s * self.old_opinions[other] * self.old_opinions[cell]) / self.measure(cell, other)
         return influence
 
     def evolve(self):
         for cell in self:
             save_probability = 1 / (1 + exp((2 * self.get_influence(cell)) / self.social_temperature))
-            r = random(1)
-            if r <= save_probability:
-                cell.opinion *= -1
+            change_probability = 1 - save_probability
+            cell.opinion *= nprnd.choice(a=[1, -1],
+                                          p=[save_probability, change_probability])
+        self._update_opinions_history()
 
     def get_plus_adopters(self):
         adopters = 0
@@ -55,3 +60,7 @@ class CellSystem:
         for cell in self:
             if cell.opinion < 0: adopters += 1
         return adopters
+
+    def _update_opinions_history(self):
+        for cell in self:
+            self.old_opinions[cell] = cell.opinion

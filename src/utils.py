@@ -15,3 +15,5 @@ def get_from(array, probabilities):
         down_prob = upper_prob
         upper_prob += probs[i+1]
     return None
+
+urandom = random
