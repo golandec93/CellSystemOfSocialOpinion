@@ -46,7 +46,7 @@ def generate_radial_sample(radius):
     cells = [Cell(opinion=get_from(array=(-1, +1), probabilities=(1 / 2, 1 / 2)), s=urandom() * 5, b=1, x=x_coords[i],
                   y=y_coords[i])
              for i in range(0, cells_number)]
-    # set central dot as leader
+    # sett central dot as leader
     next(filter(lambda cell: cell.x is 10 and cell.y is 10, cells)).s = 30
     return cells
 
