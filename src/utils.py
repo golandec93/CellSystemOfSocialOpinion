@@ -1,19 +1,15 @@
+from time import strftime, gmtime
+
 from numpy.random import random
+import numpy.random as np_rnd
 
 
 def get_from(array, probabilities):
-    probs = list(probabilities)
-    probs[len(probs)-1] += 1
-    r = random(1)
+    return np_rnd.choice(a=array, p=probabilities)
 
-    upper_prob = probs[0]
-    down_prob = 0
 
-    for i in range(0, len(probs)):
-        if down_prob <= r < upper_prob:
-            return array[i]
-        down_prob = upper_prob
-        upper_prob += probs[i+1]
-    return None
+def get_current_date_and_time(pattern='%Y-%m-%d_%H%M%S'):
+    return strftime(pattern, gmtime())
+
 
 urandom = random

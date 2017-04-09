@@ -1,4 +1,7 @@
+import os
+
 from src.utils import *
+import src.dmanagement as dmn
 
 
 def test_decorator(test):
@@ -16,7 +19,7 @@ def test_decorator(test):
 
 @test_decorator
 def utils_test():
-    opinion = get_from(array=(-1, 1, 0), probabilities=(1 / 2, 1 / 2))
+    opinion = get_from(array=(-1, 1), probabilities=(1 / 2, 1 / 2))
     if opinion != -1 and opinion != 1:
         raise Exception('so close :(')
 
@@ -34,10 +37,22 @@ def utils_test():
             plus += 1
         elif c < 0:
             minus += 1
-        elif c is 0:
+        elif c == 0:
             null += 1
     print("set = {0}\nprobabilities = {1}".format(a, p))
     print("plus: {0}\nminus: {1}\nnull: {2}".format(plus, minus, null))
 
 
-#utils_test()
+@test_decorator
+def save_test():
+    cells = dmn.generate_radial_sample(5)
+    file_path = dmn.get_current_date_and_time() + ".csv"
+    dmn.save_to_csv(cells, file_path)
+    loaded = dmn.load_cells_from_csv(file_path)
+    for l, r in zip(cells, loaded):
+        if l != r:
+            raise Exception('not equals:\n{0}\n{1}'.format(l, r))
+    os.remove(file_path)
+
+utils_test()
+save_test()

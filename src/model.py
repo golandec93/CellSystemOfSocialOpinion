@@ -10,6 +10,23 @@ class Cell:
         self.y = y
         self.x = x
 
+    def __format__(self, format_spec):
+        return self.__str__()
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return 'x={0}, y={1}, s={2}, b={3}, opinion={4}'.format(self.x, self.y, self.s, self.b, self.opinion)
+
+    def __eq__(self, other):
+        return True if self.x == other.x \
+                       and self.y == other.y \
+                       and self.b == other.b \
+                       and self.opinion == other.opinion \
+                       and self.s == other.s \
+            else False
+
 
 class CellSystem:
     def __init__(self, cells, social_temperature, system_lobby_plus, system_lobby_minus, measure):
@@ -46,7 +63,7 @@ class CellSystem:
             save_probability = 1 / (1 + exp((2 * self.get_influence(cell)) / self.social_temperature))
             change_probability = 1 - save_probability
             cell.opinion *= nprnd.choice(a=[1, -1],
-                                          p=[save_probability, change_probability])
+                                         p=[save_probability, change_probability])
         self._update_opinions_history()
 
     def get_plus_adopters(self):
